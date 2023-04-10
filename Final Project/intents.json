@@ -1,13 +1,234 @@
-{"intents": [
-    {"tag": "greeting",
-      "patterns": ["Hi", "How are you", "Is anyone there?", "Hello", "Good day", "Whats up", "Hey", "greetings"],
-      "responses": ["Hello!", "Good to see you again!", "Hi there, how can I help?"],
-      "context_set": ""
-    },
-    {"tag": "goodbye",
-      "patterns": ["cya", "See you later", "Goodbye", "I am Leaving", "Have a Good day", "bye", "cao", "see ya"],
-      "responses": ["Sad to see you go :(", "Talk to you later", "Goodbye!"],
-      "context_set": ""
-    }
-  ]
+{
+    "intents": [
+      {
+        "tag": "greeting",
+        "patterns": [
+          "Hi",
+          "Hello",
+          "Hey",
+          "Good morning",
+          "Good afternoon",
+          "Howdy"
+        ],
+        "responses": [
+          "Hello! Welcome to East Carolina University. How can I assist you today?",
+          "Hi there! How may I help you today?",
+          "Hey! What brings you to East Carolina University today?"
+        ]
+      },
+      {
+        "tag": "admissions",
+        "patterns": [
+          "How do I apply for admission?",
+          "Can you help me with the admissions process?",
+          "What are the admission requirements?",
+          "I want to enroll in a degree program",
+          "How much does it cost to apply to ECU?"
+        ],
+        "responses": [
+          "Great! We're thrilled you're interested in applying to East Carolina University. You can find information on the admissions process and requirements on our website at https://www.ecu.edu/admissions",
+          "Of course! You can apply to ECU online or by mail. Our website has all the information you need to get started: https://www.ecu.edu/admissions",
+          "Absolutely! We have a variety of undergraduate and graduate programs available. You can learn more about the admissions process and requirements on our website: https://www.ecu.edu/admissions"
+        ]
+      },
+      {
+        "tag": "financial_aid",
+        "patterns": [
+          "How do I apply for financial aid?",
+          "Can you help me with my FAFSA?",
+          "What types of financial aid are available?",
+          "I need help paying for college"
+        ],
+        "responses": [
+          "Sure! You can find information on how to apply for financial aid on our website at https://www.ecu.edu/financial-aid",
+          "Of course! We have a team of financial aid advisors who can assist you with the FAFSA and other financial aid questions. You can find their contact information on our website: https://www.ecu.edu/financial-aid",
+          "Absolutely! We offer a variety of financial aid options, including grants, scholarships, and loans. You can learn more about the different types of financial aid on our website: https://www.ecu.edu/financial-aid"
+        ]
+      },
+      {
+        "tag": "housing",
+        "patterns": [
+          "Can you help me find housing?",
+          "What are my housing options on campus?",
+          "How do I apply for on-campus housing?",
+          "What is the cost of housing at ECU?"
+        ],
+        "responses": [
+          "Of course! We have a variety of on-campus housing options available, including traditional residence halls and apartment-style living. You can learn more about housing options and apply for housing on our website at https://www.ecu.edu/housing",
+          "Absolutely! We have a variety of housing options available to students, including residence halls and apartments. You can find more information on our website at https://www.ecu.edu/housing",
+          "Sure! We offer on-campus housing for students who want to live on campus. You can learn more about the different housing options and costs on our website at https://www.ecu.edu/housing"
+        ]
+      },
+      {
+        "tag": "goodbye",
+        "patterns": [
+          "Thanks for your help",
+          "Goodbye",
+          "See you",
+          "later",
+          "I have to go",
+          "Take care",
+          "Bye for now"
+        ],
+        "responses": [
+          "You're welcome! If you have any other questions, don't hesitate to ask. Have a great day!",
+          "Goodbye! It was great helping you today. Have a wonderful day!",
+          "Take care and have a great day! Feel free to come back if you have any other questions."
+        ]
+      },
+      {
+        "tag": "majors",
+        "patterns": [
+          "What majors does East Carolina University offer?"
+        ],
+        "responses": [
+          "East Carolina University offers over 100 undergraduate and graduate programs, including majors in business, engineering, health sciences, education, arts and sciences, and more.",
+          "Some of the popular majors at East Carolina University include nursing, biology, psychology, communication, and exercise physiology.",
+          "East Carolina University also offers a number of online and distance learning programs for students who prefer to study remotely."
+        ]
+      },
+      {
+        "tag": "student_ratio",
+        "patterns": [
+          "What is the student-to-faculty ratio at East Carolina University?"
+        ],
+        "responses": [
+          "The student-to-faculty ratio at East Carolina University is approximately 18:1, which means that students have plenty of opportunities to engage with their professors and receive individualized attention.",
+          "East Carolina University is committed to providing students with a high-quality education, and the university's small class sizes ensure that students receive personalized instruction and support.",
+          "East Carolina University is proud of its dedicated faculty, who are passionate about teaching and helping students achieve their academic and professional goals."
+        ]
+      },
+      {
+        "tag": "resources",
+        "patterns": [
+          "What resources are available to help students succeed at East Carolina University?"
+        ],
+        "responses": [
+          "East Carolina University offers a range of resources to help students succeed, including academic advising, tutoring, study groups, and writing centers.",
+          "The university also provides students with access to state-of-the-art facilities and technologies, such as computer labs, research centers, and libraries.",
+          "East Carolina University is committed to supporting students throughout their academic journey, and offers a range of programs and services to help students navigate challenges and achieve their goals."
+        ]
+      },
+      {
+        "tag": "opportunities",
+        "patterns": [
+          "What opportunities are available for student involvement at East Carolina University?"
+        ],
+        "responses": [
+          "East Carolina University has over 400 registered student organizations, including clubs and groups focused on academic, cultural, recreational, and service-oriented activities.",
+          "Students can also participate in intramural sports, club sports, and other recreational activities, as well as attend a variety of cultural events, lectures, and performances on campus.",
+          "Additionally, East Carolina University offers a number of leadership development programs and volunteer opportunities, allowing students to build their skills and make a positive impact on their communities."
+        ]
+      },
+      {
+        "tag": "cost",
+        "patterns": [
+          "What is the cost of attendance at East Carolina University?"
+        ],
+        "responses": [
+          "The cost of attendance at East Carolina University varies depending on a student's residency status, chosen program of study, and other factors. However, the university is committed to making higher education accessible and affordable, and offers a range of financial aid options to help students pay for their education.",
+          "Some of the financial aid options available to students at East Carolina University include scholarships, grants, loans, and work-study programs.",
+          "Students can also use the university's Net Price Calculator to estimate the cost of attendance and determine their eligibility for financial aid."
+        ]
+      },
+      {
+        "tag": "class_size",
+        "patterns": [
+          "What is the average class size at East Carolina University?"
+        ],
+        "responses": [
+          "The average class size at East Carolina University is approximately 25 students, which allows for personalized attention and engagement between students and their professors.",
+          "The university is committed to providing a high-quality education and the small class sizes ensure that students have ample opportunity for interaction and discussion.",
+          "With smaller class sizes, students can also benefit from more individualized instruction and feedback from their professors."
+        ]
+      },
+      {
+        "tag": "campus_like",
+        "patterns": [
+          "What is the campus life like at East Carolina University?"
+        ],
+        "responses": [
+          "East Carolina University has a vibrant campus life with many opportunities for students to get involved and engaged. The university hosts a variety of events throughout the year, including concerts, festivals, and cultural events.",
+          "Students can also participate in intramural and club sports, join one of the many student organizations, or take advantage of the university's many recreational facilities, including fitness centers and outdoor recreation areas.",
+          "With a diverse student population, there is always something to do and many opportunities for students to connect with their peers and build a sense of community on campus."
+        ]
+      },
+      {
+        "tag": "retention_rate",
+        "patterns": [
+          "What is the student retention rate at East Carolina University?"
+        ],
+        "responses": [
+          "The student retention rate at East Carolina University is approximately 83%, which is a testament to the university's commitment to student success and support.",
+          "The university provides a range of resources and services to help students navigate their academic journey and achieve their goals, from academic advising to tutoring and career counseling.",
+          "With a focus on student engagement and support, East Carolina University is dedicated to helping students succeed both inside and outside of the classroom."
+        ]
+      },
+      {
+        "tag": "career_services",
+        "patterns": [
+          "What kind of career services does East Carolina University offer to students?"
+        ],
+        "responses": [
+          "East Carolina University offers a range of career services to help students explore career options, develop job search strategies, and prepare for the workforce.",
+          "Some of the services available to students include career counseling, resume and cover letter review, job search assistance, and networking events with employers.",
+          "The university also has a strong alumni network and offers opportunities for students to connect with alumni and learn from their professional experiences."
+        ]
+      },
+      {
+        "tag": "study_abroad",
+        "patterns": [
+          "What kind of study abroad opportunities are available for students at East Carolina University?"
+        ],
+        "responses": [
+          "East Carolina University offers a range of study abroad programs to help students gain global perspective and develop cross-cultural competencies.",
+          "Students can choose from a variety of study abroad programs, including semester-long programs, short-term programs, and faculty-led programs.",
+          "Additionally, the university's international programs office provides support and resources to help students plan and prepare for their study abroad experience."
+        ]
+      },
+      {
+        "tag": "athletic_programs",
+        "patterns": [
+          "What kind of athletic programs does East Carolina University offer to students?"
+        ],
+        "responses": [
+          "East Carolina University offers a range of athletic programs for students, including NCAA Division I sports, club sports, and intramural sports.",
+          "Some of the popular sports programs at the university include football, basketball, baseball, and volleyball.",
+          "With a strong tradition of athletics, East Carolina University is committed to providing students with opportunities to stay active and engaged in a variety of sports and activities."
+        ]
+      },
+      {
+        "tag": "academic_support",
+        "patterns": [
+          "What kind of academic support services are available to students at East Carolina University?"
+        ],
+        "responses": [
+          "East Carolina University offers a range of academic support services to help students succeed in their coursework, including academic advising, tutoring, and writing centers.",
+          "The university also has a strong commitment to student success and offers programs such as First-Year Experience and Learning Communities to help students transition to college and build the skills they need to succeed academically.",
+          "With a focus on personalized attention and support, East Carolina University is dedicated to helping students achieve their academic and professional goals."
+        ]
+      },
+      {
+        "tag": "internship_opportunities",
+        "patterns": [
+          "What kind of internship opportunities are available for students at East Carolina University?"
+        ],
+        "responses": [
+          "East Carolina University offers a range of internship opportunities for students to gain real-world experience and build their professional networks.",
+          "The university has strong partnerships with employers in a variety of industries, and provides students with access to internships and other experiential learning opportunities that can help them gain valuable skills and experience.",
+          "Additionally, the university's career services office provides support and resources to help students find and apply for internship opportunities that align with their interests and career goals."
+        ]
+      },
+      {
+        "tag": "community_service",
+        "patterns": [
+          "What kind of community service opportunities are available for students at East Carolina University?"
+        ],
+        "responses": [
+          "East Carolina University is committed to fostering a culture of service and provides many opportunities for students to get involved in community service and volunteer projects.",
+          "The university partners with local organizations and nonprofits to provide students with meaningful service opportunities that can help them develop leadership skills, build their resumes, and make a positive impact in their communities.",
+          "Additionally, the university's Center for Leadership and Civic Engagement provides resources and support to help students plan and organize their own service projects and initiatives."
+        ]
+      }
+    ]
   }
