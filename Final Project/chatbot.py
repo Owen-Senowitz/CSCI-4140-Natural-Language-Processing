@@ -56,7 +56,7 @@ def get_response(intents_list, intents_json):
     return result
 
 
-print("Go! Bot is running!")
+print("Hello! Im your personal Pirate how can I help you today!")
 
 while True:
     message = input("")
