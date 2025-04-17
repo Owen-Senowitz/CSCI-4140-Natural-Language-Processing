@@ -33,184 +33,181 @@ if torch.cuda.is_available():
 elif torch.backends.mps.is_available() and args.variant == 'vanilla':
     device = 'mps'
 
-# TensorBoard training log
-# Had to add this because of some weird error on windows
-if __name__ == '__main__':
-    import torch.multiprocessing
-    torch.multiprocessing.freeze_support()
-        
-    writer = SummaryWriter(log_dir='expt/%s/%s_%s_pt_lr_%f_ft_lr_%f' % (
-        args.function,
-        args.tb_expt_name,
-        args.variant,
-        args.pretrain_lr,
-        args.finetune_lr))
+# TensorBoard training log        
+writer = SummaryWriter(log_dir='expt/%s/%s_%s_pt_lr_%f_ft_lr_%f' % (
+    args.function,
+    args.tb_expt_name,
+    args.variant,
+    args.pretrain_lr,
+    args.finetune_lr))
 
-    # Keep the block size 128
-    # Why is the pretraining corpus always required (even if we're not pretraining?)
-    # It's because we're using it as a hack to always have the same vocabulary
-    # (that is, the same mapping from character to integer, and we build the
-    # vocab from the pretraining corpus.)
-    block_size = 128
-    text = open(args.pretrain_corpus_path, encoding='utf-8').read()
-    pretrain_dataset = dataset.CharCorruptionDataset(text, block_size)
+# Keep the block size 128
+# Why is the pretraining corpus always required (even if we're not pretraining?)
+# It's because we're using it as a hack to always have the same vocabulary
+# (that is, the same mapping from character to integer, and we build the
+# vocab from the pretraining corpus.)
+block_size = 128
+text = open(args.pretrain_corpus_path, encoding='utf-8').read()
+pretrain_dataset = dataset.CharCorruptionDataset(text, block_size)
 
-    # We don't suggest you change these hyperparameters, as they're known to work.
-    # use them for both the vanilla and the RoPE models
-    mconf = models.GPTConfig(
-        pretrain_dataset.vocab_size,
-        pretrain_dataset.block_size,
-        n_layer=4,
-        n_head=8,
-        n_embd=256)
+# We don't suggest you change these hyperparameters, as they're known to work.
+# use them for both the vanilla and the RoPE models
+mconf = models.GPTConfig(
+    pretrain_dataset.vocab_size,
+    pretrain_dataset.block_size,
+    n_layer=4,
+    n_head=8,
+    n_embd=256)
 
-    # define models.
-    # note: models should moved to device defined on lines 30-34.
+# define models.
+# note: models should moved to device defined on lines 30-34.
 
-    model = None
-    if args.variant == 'vanilla':
-        # TODO: [part c] Make some model here
-        ### YOUR CODE HERE ###
-        model = models.GPT(mconf).to(device)
-        ### END YOUR CODE ###
-    elif args.variant == 'rope':
-        # TODO: [part g] Make some other model here
-        # set mconf.rope parameter
-        ### YOUR CODE HERE ###
-        mconf.rope = True
-        model = models.GPT(mconf).to(device)
-        ### END YOUR CODE ###
-    else:
-        raise ValueError("Unknown model variant")
+model = None
+if args.variant == 'vanilla':
+    # TODO: [part c] Make some model here
+    ### YOUR CODE HERE ###
+    model = models.GPT(mconf).to(device)
+    ### END YOUR CODE ###
+elif args.variant == 'rope':
+    # TODO: [part g] Make some other model here
+    # set mconf.rope parameter
+    ### YOUR CODE HERE ###
+    mconf.rope = True
+    model = models.GPT(mconf).to(device)
+    ### END YOUR CODE ###
+else:
+    raise ValueError("Unknown model variant")
 
-    print('Model on device: ', next(model.parameters()).device)
+print('Model on device: ', next(model.parameters()).device)
 
-    # Perform pretraining, finetuning, or evaluation
-    if args.function == 'pretrain':
-        assert args.writing_params_path is not None
-        # TODO [part f]:
-        # - Given:
-        #     1. A corpus specified in args.pretrain_corpus_path
-        #     2. An output path args.writing_params_path for the model parameters
-        # - Goals:
-        #     1. Pretrain the model on this corpus
-        #     2. Save the resulting model in args.writing_params_path
+# Perform pretraining, finetuning, or evaluation
+if args.function == 'pretrain':
+    assert args.writing_params_path is not None
+    # TODO [part f]:
+    # - Given:
+    #     1. A corpus specified in args.pretrain_corpus_path
+    #     2. An output path args.writing_params_path for the model parameters
+    # - Goals:
+    #     1. Pretrain the model on this corpus
+    #     2. Save the resulting model in args.writing_params_path
 
-        # - Make sure to use the following hyperparameters for pretraining:
-        # Hyperparameters for pretraining:
-        # max_epochs=650
-        # batch_size=128
-        # learning_rate=args.pretrain_lr
-        # lr_decay=True
-        # warmup_tokens=512*20
-        # final_tokens=650*len(pretrain_dataset)*block_size
-        # num_workers=4
-        # writer=writer
+    # - Make sure to use the following hyperparameters for pretraining:
+    # Hyperparameters for pretraining:
+    # max_epochs=650
+    # batch_size=128
+    # learning_rate=args.pretrain_lr
+    # lr_decay=True
+    # warmup_tokens=512*20
+    # final_tokens=650*len(pretrain_dataset)*block_size
+    # num_workers=4
+    # writer=writer
 
-        ### YOUR CODE HERE ###
-        # Set up the trainer configuration with the specified hyperparameters
-        tconf = trainer.TrainerConfig(
-            max_epochs=650,
-            batch_size=128,
-            learning_rate=args.pretrain_lr,
-            lr_decay=True,
-            warmup_tokens=512*20,
-            final_tokens=650*len(pretrain_dataset)*block_size,
-            num_workers=4,
-            writer=writer,
-            ckpt_path=args.writing_params_path
-        )
-        
-        # Create the trainer and train the model
-        train_trainer = trainer.Trainer(model, pretrain_dataset, None, tconf)
-        train_trainer.train()
-        ### END YOUR CODE ###
-    elif args.function == 'finetune':
-        assert args.writing_params_path is not None
-        assert args.finetune_corpus_path is not None
-        # TODO [part c] [part f]:
-        # - Given:
-        #     1. A finetuning corpus specified in args.finetune_corpus_path
-        #     2. A path args.reading_params_path containing pretrained model
-        #         parameters, or None if finetuning without a pretrained model
-        #     3. An output path args.writing_params_path for the model parameters
-        # - Goals:
-        #     1. If args.reading_params_path is specified, load these parameters
-        #         into the model
-        #     2. Finetune the model on this corpus
-        #     3. Save the resulting model in args.writing_params_path
-        # - Make sure to use the following hyperparameters:
-        #     [part d] Hyperparameters for finetuning WITHOUT a pretrained model:
-        #         max_epochs=75
-        #         batch_size=256
-        #         learning_rate=args.finetune_lr
-        #         lr_decay=True
-        #         warmup_tokens=512*20
-        #         final_tokens=200*len(pretrain_dataset)*block_size
-        #         num_workers=4
-        #         writer=writer
-        #     [part f] Hyperparameters for finetuning WITH a pretrained model:
-        #         max_epochs=10
-        #         batch_size=256
-        #         learning_rate=args.finetune_lr
-        #         lr_decay=True
-        #         warmup_tokens=512*20
-        #         final_tokens=200*len(pretrain_dataset)*block_size
-        #         num_workers=4
-        #         writer=writer
-        #     You can use the args.reading_params_path flag to switch between the
-        #     number of epochs for each case.
+    ### YOUR CODE HERE ###
+    # Set up the trainer configuration with the specified hyperparameters
+    tconf = trainer.TrainerConfig(
+        max_epochs=650,
+        batch_size=128,
+        learning_rate=args.pretrain_lr,
+        lr_decay=True,
+        warmup_tokens=512*20,
+        final_tokens=650*len(pretrain_dataset)*block_size,
+        # made 0 to avoid issue with multiprocessing on windows does not effect model performance.
+        num_workers=0,
+        writer=writer,
+        ckpt_path=args.writing_params_path
+    )
+    
+    # Create the trainer and train the model
+    train_trainer = trainer.Trainer(model, pretrain_dataset, None, tconf)
+    train_trainer.train()
+    ### END YOUR CODE ###
+elif args.function == 'finetune':
+    assert args.writing_params_path is not None
+    assert args.finetune_corpus_path is not None
+    # TODO [part c] [part f]:
+    # - Given:
+    #     1. A finetuning corpus specified in args.finetune_corpus_path
+    #     2. A path args.reading_params_path containing pretrained model
+    #         parameters, or None if finetuning without a pretrained model
+    #     3. An output path args.writing_params_path for the model parameters
+    # - Goals:
+    #     1. If args.reading_params_path is specified, load these parameters
+    #         into the model
+    #     2. Finetune the model on this corpus
+    #     3. Save the resulting model in args.writing_params_path
+    # - Make sure to use the following hyperparameters:
+    #     [part d] Hyperparameters for finetuning WITHOUT a pretrained model:
+    #         max_epochs=75
+    #         batch_size=256
+    #         learning_rate=args.finetune_lr
+    #         lr_decay=True
+    #         warmup_tokens=512*20
+    #         final_tokens=200*len(pretrain_dataset)*block_size
+    #         num_workers=4
+    #         writer=writer
+    #     [part f] Hyperparameters for finetuning WITH a pretrained model:
+    #         max_epochs=10
+    #         batch_size=256
+    #         learning_rate=args.finetune_lr
+    #         lr_decay=True
+    #         warmup_tokens=512*20
+    #         final_tokens=200*len(pretrain_dataset)*block_size
+    #         num_workers=4
+    #         writer=writer
+    #     You can use the args.reading_params_path flag to switch between the
+    #     number of epochs for each case.
 
-        ### YOUR CODE HERE ###
-        # Load the parameters from the pretrained model if specified
-        if args.reading_params_path is not None:
-            model.load_state_dict(torch.load(args.reading_params_path))
-            max_epochs = 10  # [part f] WITH a pretrained model: 10 epochs
-        else:
-            max_epochs = 75  # [part d] WITHOUT a pretrained model: 75 epochs
-
-        # Create the fine-tuning dataset
-        train_dataset = dataset.NameDataset(pretrain_dataset, 
-                                        open(args.finetune_corpus_path, encoding='utf-8').read())
-        
-        # Set up the trainer configuration
-        tconf = trainer.TrainerConfig(
-            max_epochs=max_epochs,
-            batch_size=256,
-            learning_rate=args.finetune_lr,
-            lr_decay=True,
-            warmup_tokens=512*20,
-            final_tokens=200*len(pretrain_dataset)*block_size,
-            num_workers=4,
-            writer=writer,
-            ckpt_path=args.writing_params_path
-        )
-        
-        # Create the trainer and train the model
-        train_trainer = trainer.Trainer(model, train_dataset, None, tconf)
-        train_trainer.train()
-        ### END YOUR CODE ###
-    elif args.function == 'evaluate':
-        assert args.outputs_path is not None
-        assert args.reading_params_path is not None
-        assert args.eval_corpus_path is not None
+    ### YOUR CODE HERE ###
+    # Load the parameters from the pretrained model if specified
+    if args.reading_params_path is not None:
         model.load_state_dict(torch.load(args.reading_params_path))
-        correct = 0
-        total = 0
-        with open(args.outputs_path, 'w', encoding='utf-8') as fout:
-            predictions = []
-            for line in tqdm(open(args.eval_corpus_path, encoding='utf-8')):
-                x = line.split('\t')[0]
-                x = x + '⁇'
-                x = torch.tensor([pretrain_dataset.stoi[s] for s in x],
-                                dtype=torch.long)[None,...].to(device)
-                pred = utils.sample(model, x, 32, sample=False)[0]
-                completion = ''.join([pretrain_dataset.itos[int(i)] for i in pred])
-                pred = completion.split('⁇')[1]
-                predictions.append(pred)
-                fout.write(pred + '\n')
-            total, correct = utils.evaluate_places(args.eval_corpus_path, predictions)
-        if total > 0:
-            print(f'Correct: {correct} out of {total}: {correct/total*100}%')
-        else:
-            print(f'Predictions written to {args.outputs_path}; no targets provided')
+        max_epochs = 10  # [part f] WITH a pretrained model: 10 epochs
+    else:
+        max_epochs = 75  # [part d] WITHOUT a pretrained model: 75 epochs
+
+    # Create the fine-tuning dataset
+    train_dataset = dataset.NameDataset(pretrain_dataset, 
+                                    open(args.finetune_corpus_path, encoding='utf-8').read())
+    
+    # Set up the trainer configuration
+    tconf = trainer.TrainerConfig(
+        max_epochs=max_epochs,
+        batch_size=256,
+        learning_rate=args.finetune_lr,
+        lr_decay=True,
+        warmup_tokens=512*20,
+        final_tokens=200*len(pretrain_dataset)*block_size,
+        # made 0 to avoid issue with multiprocessing on windows does not effect model performance.
+        num_workers=0,
+        writer=writer,
+        ckpt_path=args.writing_params_path
+    )
+    
+    # Create the trainer and train the model
+    train_trainer = trainer.Trainer(model, train_dataset, None, tconf)
+    train_trainer.train()
+    ### END YOUR CODE ###
+elif args.function == 'evaluate':
+    assert args.outputs_path is not None
+    assert args.reading_params_path is not None
+    assert args.eval_corpus_path is not None
+    model.load_state_dict(torch.load(args.reading_params_path))
+    correct = 0
+    total = 0
+    with open(args.outputs_path, 'w', encoding='utf-8') as fout:
+        predictions = []
+        for line in tqdm(open(args.eval_corpus_path, encoding='utf-8')):
+            x = line.split('\t')[0]
+            x = x + '⁇'
+            x = torch.tensor([pretrain_dataset.stoi[s] for s in x],
+                            dtype=torch.long)[None,...].to(device)
+            pred = utils.sample(model, x, 32, sample=False)[0]
+            completion = ''.join([pretrain_dataset.itos[int(i)] for i in pred])
+            pred = completion.split('⁇')[1]
+            predictions.append(pred)
+            fout.write(pred + '\n')
+        total, correct = utils.evaluate_places(args.eval_corpus_path, predictions)
+    if total > 0:
+        print(f'Correct: {correct} out of {total}: {correct/total*100}%')
+    else:
+        print(f'Predictions written to {args.outputs_path}; no targets provided')
