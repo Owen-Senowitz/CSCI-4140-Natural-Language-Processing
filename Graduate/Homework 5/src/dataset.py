@@ -101,7 +101,42 @@ class CharCorruptionDataset(Dataset):
     def __getitem__(self, idx):
         # TODO [part e]: see spec above
         ### YOUR CODE HERE ###
-        pass
+        # 0. Retrieve the document at the given index
+        document = self.data[idx]
+        
+        # 1. Randomly truncate the document
+        min_length = 4
+        max_length = int(self.block_size * 7/8)
+        trunc_length = random.randint(min_length, max_length)
+        truncated_doc = document[:trunc_length]
+        
+        # 2. Split into prefix, masked_content, suffix
+        total_length = len(truncated_doc)
+        # Average masked content length is 1/4 of truncated document
+        masked_content_length = random.randint(1, min(total_length-2, int(total_length/2)))
+        
+        # Get a random starting point for masked content
+        masked_start = random.randint(0, total_length - masked_content_length)
+        prefix = truncated_doc[:masked_start]
+        masked_content = truncated_doc[masked_start:masked_start+masked_content_length]
+        suffix = truncated_doc[masked_start+masked_content_length:]
+        
+        # 3. Rearrange into masked string format
+        masked_string = prefix + self.MASK_CHAR + suffix + self.MASK_CHAR + masked_content
+        
+        # Add padding to make the length self.block_size + 1
+        padding_length = self.block_size + 1 - len(masked_string)
+        masked_string = masked_string + self.PAD_CHAR * padding_length
+        
+        # 4. Create input and output pairs
+        x = masked_string[:-1]  # input is all but the last character
+        y = masked_string[1:]   # output is all but the first character
+        
+        # 5. Encode as tensors using the vocabulary
+        x = torch.tensor([self.stoi[c] for c in x], dtype=torch.long)
+        y = torch.tensor([self.stoi[c] for c in y], dtype=torch.long)
+        
+        return x, y
         ### END YOUR CODE ###
 
 

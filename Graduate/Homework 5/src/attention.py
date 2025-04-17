@@ -32,7 +32,18 @@ def precompute_rotary_emb(dim, max_positions):
     rope_cache = None
     # TODO: [part g]
     ### YOUR CODE HERE ###
-    pass
+    half_dim = dim // 2
+    # Create position indices and frequencies
+    positions = torch.arange(max_positions).unsqueeze(1)  # [max_positions, 1]
+    frequencies = torch.exp(
+        torch.arange(0, half_dim, 1).float() * (-math.log(10000.0) / (half_dim - 1))
+    ).unsqueeze(0)  # [1, dim/2]
+    
+    # Compute position * freq for all combinations
+    args = positions * frequencies  # [max_positions, dim/2]
+    
+    # Compute cos and sin values and arrange them
+    rope_cache = torch.stack([torch.cos(args), torch.sin(args)], dim=-1)  # [max_positions, dim/2, 2]
     ### END YOUR CODE ###
     return rope_cache
 
@@ -52,7 +63,31 @@ def apply_rotary_emb(x, rope_cache):
 
     rotated_x = None
     ### YOUR CODE HERE ###
-    pass
+    # Get dimensions
+    B, H, T, D = x.shape
+    
+    # Reshape x to apply rotary embeddings
+    x_complex = torch.view_as_complex(x.reshape(B, H, T, D//2, 2))
+    
+    # Truncate rope_cache to the sequence length if needed
+    trunc_rope_cache = rope_cache[:T]
+    
+    # Extract cos and sin from the truncated cache
+    cos = trunc_rope_cache[:, :, 0]  # [T, D//2]
+    sin = trunc_rope_cache[:, :, 1]  # [T, D//2]
+    
+    # Apply rotation using complex multiplication
+    # cos(θ) + i sin(θ) * (a + ib) = (a cos(θ) - b sin(θ)) + i(a sin(θ) + b cos(θ))
+    # Create a complex multiplier
+    multiplier = torch.view_as_complex(
+        torch.stack([cos, sin], dim=-1)  # [T, D//2, 2]
+    )  # [T, D//2] complex
+    
+    # Apply the rotation
+    x_rotated = x_complex * multiplier.unsqueeze(0).unsqueeze(0)  # [B, H, T, D//2] complex
+    
+    # Convert back to real
+    rotated_x = torch.view_as_real(x_rotated).reshape(B, H, T, D)
     ### END YOUR CODE ###
     return rotated_x
 
@@ -80,7 +115,8 @@ class CausalSelfAttention(nn.Module):
             # Hint: The maximum sequence length is given by config.block_size.
             rope_cache = None
             ### YOUR CODE HERE ###
-            pass
+            dim = config.n_embd // config.n_head
+            rope_cache = precompute_rotary_emb(dim, config.block_size)
             ### END YOUR CODE ###
 
             self.register_buffer("rope_cache", rope_cache)
@@ -106,7 +142,8 @@ class CausalSelfAttention(nn.Module):
         if self.rope:
             # TODO: [part g] Apply RoPE to the query and key.
             ### YOUR CODE HERE ###
-            pass
+            q = apply_rotary_emb(q, self.rope_cache)
+            k = apply_rotary_emb(k, self.rope_cache)
             ### END YOUR CODE ###
 
         # causal self-attention; Self-attend: (B, nh, T, hs) x (B, nh, hs, T) -> (B, nh, T, T)
